@@ -46,9 +46,10 @@ jobs:
       - name: Docker build & push to prod
         run: |
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u imcoder0000 --password-stdin
-          docker build -f Dockerfile -t ghcr.io/imcoder0000/spring-backend:latest .
-          docker push ghcr.io/imcoder0000/spring-backend:latest
+          docker buildx create --use --name multiarch
+          docker buildx build --platform linux/arm64 -f Dockerfile -t ghcr.io/imcoder0000/spring-backend:latest --push .
           docker logout
+
 
 
           
