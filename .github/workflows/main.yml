@@ -33,7 +33,8 @@ jobs:
         
       - name: Create application.yaml for CD Deploy
         run: |
-
+          echo "${{ secrets.PRODUCTION_ENV }}" > .env
+          
       - name: Grant execute permission for gradlew
         run: chmod +x gradlew
 
@@ -48,13 +49,14 @@ jobs:
         run: |
           echo "${{ secrets.GHCR_TOKEN }}" | docker login ghcr.io -u ${{ secrets.ACTOR }} --password-stdin
           docker buildx create --name arm64builder --use
-    
+          docker buildx build --platform linux/amd64,linux/arm64 -f Dockerfile -t ghcr.io/${{ secrets.ACTOR }}/spring-backend:latest --push .
+          docker logout
 
           
   deploy:
     needs: build
     name: Deploy
-    runs-on: [ self-hosted, deploy-spriIng ]
+    runs-on: [ self-hosted, deploy-spring ]
     steps:
       - name: Deploy to Production (local shell)
         run: |
@@ -67,3 +69,4 @@ jobs:
           docker logout
       
           docker-compose up -d
+
