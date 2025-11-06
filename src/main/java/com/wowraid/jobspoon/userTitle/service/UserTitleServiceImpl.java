@@ -6,6 +6,7 @@ import com.wowraid.jobspoon.userTitle.entity.UserTitle;
 import com.wowraid.jobspoon.profileAppearance.Repository.ProfileAppearanceRepository;
 import com.wowraid.jobspoon.userTitle.repository.UserTitleRepository;
 import lombok.RequiredArgsConstructor;
+import lombok.extern.slf4j.Slf4j;
 import org.springframework.stereotype.Service;
 import org.springframework.transaction.annotation.Transactional;
 
@@ -15,6 +16,7 @@ import java.util.List;
 @Service
 @RequiredArgsConstructor
 @Transactional
+@Slf4j
 public class UserTitleServiceImpl implements UserTitleService {
 
     private final UserTitleRepository titleRepository;
@@ -24,6 +26,7 @@ public class UserTitleServiceImpl implements UserTitleService {
     @Transactional
     public void initTitle(Long accountId) {
         if (titleRepository.existsByAccountId(accountId)) {
+            log.info("✅ 기본 칭호 생성 스킵 - 이미 존재하는 accountId={}", accountId);
             return;
         }
 
@@ -35,6 +38,8 @@ public class UserTitleServiceImpl implements UserTitleService {
                 .build();
 
         titleRepository.save(baseTitle);
+
+        log.info("✅ 기본 칭호 생성 완료 - accountId={}, title={}", accountId, baseTitle.getTitleCode());
     }
 
     /** 칭호 장착 **/
